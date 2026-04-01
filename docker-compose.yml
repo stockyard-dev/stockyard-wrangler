@@ -1,0 +1,23 @@
+services:
+  wrangler:
+    image: ghcr.io/stockyard-dev/stockyard-wrangler:latest
+    ports:
+      - "8810:8810"
+    environment:
+      - PORT=${STOCKYARD_PORT:-8810}
+      - DATA_DIR=${STOCKYARD_DATA_DIR:-/data}
+      - RETENTION_DAYS=${STOCKYARD_RETENTION_DAYS:-30}
+      - WRANGLER_LICENSE_KEY=${STOCKYARD_WRANGLER_LICENSE_KEY:-}
+    volumes:
+      - wrangler-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8810/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  wrangler-data:
+    driver: local
